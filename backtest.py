@@ -83,13 +83,13 @@ class optimizer(bt.SignalStrategy):
 
     def getPosDifference(self, cash, alloc, new_price, cur_pos):
         pos_cash = new_price * cur_pos
-        # print('pos_cash',pos_cash)
+        print('pos_cash',pos_cash)
         all_cash = cash + np.sum(pos_cash)
-        # print('all_cash',all_cash)
+        print('all_cash',all_cash)
         cash_alloc = alloc * all_cash
-        # print('cash_alloc',cash_alloc)
+        print('cash_alloc',cash_alloc)
         new_pos = (cash_alloc / new_price).astype(int)
-        # print('new_pos',new_pos)
+        print('new_pos',new_pos)
         diff_pos = cur_pos - new_pos
         return diff_pos * (-1)
 
@@ -139,13 +139,10 @@ class optimizer(bt.SignalStrategy):
 
         m_input = self.getModelDataFrame()
         if self.update_counter == 0:
-
             self.new_pct = np.round(self.model.get_allocations(m_input.values, **self.model_params), 2)
-
+            print(self.isFirst)
             if self.isFirst == True:
-                self.isFirst = False
                 self.old_pct = np.zeros(len(self.new_pct))
-                #
                 # if np.array_equal(self.new_pct, self.old_pct) == False:
                 #     if self.verbose > 1:
                 #         print('size', self.getPosSize().tolist())
@@ -154,7 +151,6 @@ class optimizer(bt.SignalStrategy):
                 #         print("rebalance new percent.",self.new_pct)
 
                 cash = self.broker.get_cash()
-
                 new_price = self.getCurrentClosePrice()
                 cur_pos = self.getPosSize()
                 upd_pos = self.getPosDifference(cash, self.new_pct, new_price, cur_pos)
@@ -184,6 +180,7 @@ class optimizer(bt.SignalStrategy):
 
 
 
+
 cerebro = bt.Cerebro()
 
 cerebro.broker.set_cash(10000)
@@ -195,8 +192,10 @@ for a in tickers:
 
 cerebro.addstrategy(optimizer)
 
-cerebro.run()
-cerebro.plot()
+thestrats = cerebro.run()
+thestrat = thestrats[0]
+
+# cerebro.plot()
 
 print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
