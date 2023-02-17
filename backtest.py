@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import copy
 import backtrader as bt
 import backtrader.feeds as btfeeds
-from pypfopt import HRPOpt
+from pypfopt import HRPOpt, risk_models, expected_returns
 
 yf.pdr_override()
 
@@ -38,11 +38,14 @@ class Model:
         data = pd.DataFrame(data)
 
         model_n = param['model_n']
-        isEmsRet = param['isEmsRet']
-        isExpCov = param['isExpCov']
         isCleanWeight = param['isCleanWeight']
         upd_period = param['upd_period']
         isDataCollecting = param['collectData']
+
+        mu = expected_returns.mean_historical_return(self.data).fillna(0.0).values
+
+        S = risk_models.sample_cov(self.data).fillna(0.0).values
+
 
         # data = data.fillna(0.0)
         if (self.isFirst == True) or (upd_period == 0) or (isDataCollecting == False):
@@ -69,6 +72,13 @@ class optimizer(bt.SignalStrategy):
         ('DataCounter', 125),
         ('RebalanceDay', 22),
         ('reserveCash', 1000.0),
+        ('model_params', {
+        'model_n':'HRP',
+        'collectData':False,
+        'isCleanWeight':False,
+        'upd_period': 22}),
+        ('printlog', 0),
+        ('model', Model())
     )
 
     def getPosDifference(self, cash, alloc, new_price, cur_pos):
@@ -118,6 +128,8 @@ class optimizer(bt.SignalStrategy):
         self.RebalanceDay = self.params.RebalanceDay  # 22
         self.reserveCash = self.params.reserveCash  # 1000.0
         self.verbose = self.params.printlog  # 0
+        self.model = self.params.model
+        self.model_params = self.params.model_params
         pass
 
     def next(self):
