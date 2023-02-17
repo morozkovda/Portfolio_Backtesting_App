@@ -41,11 +41,7 @@ class Model:
 
         S = risk_models.sample_cov(self.data).fillna(0.0).values
 
-        self.isFirst = False
         self.data = data.copy()
-
-
-        # print(data.iloc[-upd_period:])
 
         if model_n == 'HRP':
             hrp = HRPOpt(self.data.pct_change(), S)
@@ -62,12 +58,11 @@ class optimizer(bt.SignalStrategy):
     params = (
         ('DataCounter', 125),
         ('RebalanceDay', 22),
-        ('reserveCash', 1000.0),
         ('model_params',
          { 'model_n':'HRP',
         'isCleanWeight':False}
          ),
-        ('printlog', 1),
+        ('printlog', 0),
         ('model', Model())
     )
 
@@ -160,8 +155,6 @@ class optimizer(bt.SignalStrategy):
         self.update_counter += 1
         if self.update_counter == self.RebalanceDay:
             self.update_counter = 0
-
-
 
 cerebro = bt.Cerebro()
 
