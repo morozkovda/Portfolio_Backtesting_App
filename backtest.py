@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import copy
 import backtrader as bt
 import backtrader.feeds as btfeeds
+from pypfopt import HRPOpt
+
 yf.pdr_override()
 
 #get data
@@ -29,17 +31,6 @@ class Model:
     def __init__(self):
         self.data = None
         self.isFirst = True
-
-
-    def resetModel(self):
-        self.data = None
-        self.isFirst = True
-        pass
-
-    # a nonconvex objective from  Kolm et al (2014)
-    def deviation_risk_parity(self, w, cov_matrix):
-        diff = w * np.dot(cov_matrix, w) - (w * np.dot(cov_matrix, w)).reshape(-1, 1)
-        return (diff ** 2).sum().sum()
 
     # def get_allocations(self, data, model_n = 'MeanVariance', isEmsRet = False, isExpCov = False, isCleanWeight = False, upd_period = 0):
     def get_allocations(self, data, **param):
@@ -80,7 +71,7 @@ class optimizer(bt.SignalStrategy):
         ('reserveCash', 1000.0),
     )
 
-    def getPosDiffiretce(self, cash, alloc, new_price, cur_pos):
+    def getPosDifference(self, cash, alloc, new_price, cur_pos):
         pos_cash = new_price * cur_pos
         # print('pos_cash',pos_cash)
         all_cash = cash + np.sum(pos_cash)
@@ -126,7 +117,6 @@ class optimizer(bt.SignalStrategy):
         self.DataCounter = self.params.DataCounter  # 125
         self.RebalanceDay = self.params.RebalanceDay  # 22
         self.reserveCash = self.params.reserveCash  # 1000.0
-
         self.verbose = self.params.printlog  # 0
         pass
 
@@ -155,7 +145,7 @@ class optimizer(bt.SignalStrategy):
 
                 new_price = self.getCurrentClosePrice()
                 cur_pos = self.getPosSize()
-                upd_pos = self.getPosDiffiretce(cash, self.new_pct, new_price, cur_pos)
+                upd_pos = self.getPosDifference(cash, self.new_pct, new_price, cur_pos)
                 to_sell = []
                 to_buy = []
                 for i, p in enumerate(upd_pos):
@@ -178,7 +168,6 @@ class optimizer(bt.SignalStrategy):
         self.update_counter += 1
         if self.update_counter == self.RebalanceDay:
             self.update_counter = 0
-
 
 
 
