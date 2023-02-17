@@ -9,10 +9,10 @@ from pypfopt import HRPOpt, risk_models, expected_returns
 yf.pdr_override()
 
 #get data
-tickers = ['SPY' ,'META', 'AAPL']
+tickers = ['BTC-USD' ,'ETH-USD', 'BNB-USD']
 stock = pdr.get_data_yahoo(tickers,
-                start= datetime(2015, 1, 1),
-                end= datetime(2023, 2, 10), interval = '1d')
+                start= datetime(2020, 1, 1),
+                end= datetime(2023, 2, 16), interval = '1d')
 stock.head()
 
 very_small_float = 1.0
@@ -29,7 +29,6 @@ class Model:
         self.data = None
         self.isFirst = True
 
-    # def get_allocations(self, data, model_n = 'MeanVariance', isEmsRet = False, isExpCov = False, isCleanWeight = False, upd_period = 0):
     def get_allocations(self, data, **param):
 
         data = pd.DataFrame(data)
@@ -62,7 +61,7 @@ class optimizer(bt.SignalStrategy):
          { 'model_n':'HRP',
         'isCleanWeight':False}
          ),
-        ('printlog', 0),
+        ('printlog', 1),
         ('model', Model())
     )
 
