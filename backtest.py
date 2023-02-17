@@ -196,7 +196,10 @@ for a in tickers:
 cerebro.addstrategy(optimizer)
 
 cerebro.run()
+cerebro.plot()
 
 print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+
+
 
 
