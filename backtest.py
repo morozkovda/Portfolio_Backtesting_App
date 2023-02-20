@@ -2,7 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import backtrader as bt
-from pypfopt import EfficientFrontier, HRPOpt, risk_models, expected_returns
+from pypfopt import EfficientFrontier, CLA, HRPOpt, risk_models, expected_returns
 from scipy.special import softmax
 yf.pdr_override()
 
@@ -42,6 +42,14 @@ class Model:
                 return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
             return pd.DataFrame(weights, index=[0]).to_numpy()[0]
 
+        elif model_n == 'CLA':
+            ef = CLA(mu, S)
+            weights = ef.max_sharpe()
+            cleaned_weights = ef.clean_weights()
+            # hrp.portfolio_performance(verbose=True)
+            if isCleanWeight == True:
+                return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
+            return pd.DataFrame(weights, index=[0]).to_numpy()[0]
         elif model_n == 'HRP':
             hrp = HRPOpt(self.data.pct_change(), S)
             weights = hrp.optimize()

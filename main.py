@@ -42,7 +42,7 @@ params = {'DataCounter' : 125,
         'printlog': 0,
         'model': Model(),
          'model_params':
-              {'model_n': 'risk_parity',
+              {'model_n': 'equal',
                'isCleanWeight': False}
           }
 
