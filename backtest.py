@@ -5,24 +5,7 @@ import numpy as np
 import pandas as pd
 import backtrader as bt
 from pypfopt import HRPOpt, risk_models, expected_returns
-
 yf.pdr_override()
-
-#get data
-tickers = ['BTC-USD' ,'ETH-USD', 'BNB-USD']
-stock = pdr.get_data_yahoo(tickers,
-                start= datetime(2020, 1, 1),
-                end= datetime(2023, 2, 16), interval = '1d')
-stock.head()
-
-very_small_float = 1.0
-idx = pd.IndexSlice
-def getStock(df, s):
-    c = df.loc[:,idx[:,s]]
-    c.columns = c.columns.droplevel(1)
-    c = pd.DataFrame(c.to_records()).set_index('Date')
-    c = c.fillna(very_small_float)
-    return c
 
 class Model:
     def __init__(self):
@@ -57,12 +40,11 @@ class optimizer(bt.SignalStrategy):
     params = (
         ('DataCounter', 125),
         ('RebalanceDay', 22),
-        ('model_params',
+        ('printlog', 0),
+        ('model', Model()),
+         ('model_params',
          { 'model_n':'HRP',
-        'isCleanWeight':False}
-         ),
-        ('printlog', 1),
-        ('model', Model())
+        'isCleanWeight':False} )
     )
 
     def getPosDifference(self, cash, alloc, new_price, cur_pos):
@@ -155,23 +137,7 @@ class optimizer(bt.SignalStrategy):
         if self.update_counter == self.RebalanceDay:
             self.update_counter = 0
 
-cerebro = bt.Cerebro()
 
-cerebro.broker.set_cash(100000)
-print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
-
-for a in tickers:
-    cerebro.adddata(bt.feeds.PandasData(dataname=getStock(stock, a), name=a))
-
-cerebro.addstrategy(optimizer)
-
-thestrats = cerebro.run()
-thestrat = thestrats[0]
-
-cerebro.plot()
-
-print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
 
 
