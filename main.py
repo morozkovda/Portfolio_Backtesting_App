@@ -1,11 +1,9 @@
 import yfinance as yf
 from pandas_datareader import data as pdr
 from datetime import datetime
-import numpy as np
 import pandas as pd
 #pip install git+https://github.com/mementum/backtrader.git@0fa63ef4a35dc53cc7320813f8b15480c8f85517#egg=backtrader
 import backtrader as bt
-from pypfopt import HRPOpt, risk_models, expected_returns
 yf.pdr_override()
 
 # get data

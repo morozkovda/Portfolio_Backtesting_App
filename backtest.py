@@ -1,6 +1,4 @@
 import yfinance as yf
-from pandas_datareader import data as pdr
-from datetime import datetime
 import numpy as np
 import pandas as pd
 import backtrader as bt
