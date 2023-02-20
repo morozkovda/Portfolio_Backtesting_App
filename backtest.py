@@ -2,7 +2,8 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import backtrader as bt
-from pypfopt import HRPOpt, risk_models, expected_returns
+from pypfopt import EfficientFrontier, HRPOpt, risk_models, expected_returns
+from scipy.special import softmax
 yf.pdr_override()
 
 # create class that will contain all the models
@@ -15,6 +16,7 @@ class Model:
     def get_allocations(self, data, **param):
 
         data = pd.DataFrame(data)
+        self.data = data.copy()
 
         model_n = param['model_n']
         isCleanWeight = param['isCleanWeight']
@@ -23,16 +25,31 @@ class Model:
 
         S = risk_models.sample_cov(self.data).fillna(0.0).values
 
-        self.data = data.copy()
 
         #here you can add your models
-        if model_n == 'HRP':
+
+        if model_n == 'MV':
+            ef = EfficientFrontier(mu, S)
+            weights = ef.min_volatility()
+            cleaned_weights = ef.clean_weights()
+            if isCleanWeight == True:
+                return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
+            return pd.DataFrame(weights, index=[0]).to_numpy()[0]
+
+        elif model_n == 'HRP':
             hrp = HRPOpt(self.data.pct_change(), S)
             weights = hrp.optimize()
             cleaned_weights = hrp.clean_weights()
             if isCleanWeight == True:
                 return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
             return pd.DataFrame(weights, index=[0]).to_numpy()[0]
+
+        elif model_n == 'random':
+            a = np.random.uniform(size=[self.data.shape[1]])
+            return softmax(a)
+        elif model_n == 'equal':
+            a = np.array([1 / self.data.shape[1]] * self.data.shape[1])
+            return a
 
         return []
 
@@ -47,7 +64,8 @@ class optimizer(bt.SignalStrategy):
         ('model', Model()),
          ('model_params',
          { 'model_n':'HRP',
-        'isCleanWeight':False} )
+        'isCleanWeight':False}
+          )
     )
 
     # create function to calculate difference from previous and current positiom

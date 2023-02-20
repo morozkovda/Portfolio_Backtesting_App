@@ -42,8 +42,8 @@ params = {'DataCounter' : 125,
         'printlog': 0,
         'model': Model(),
          'model_params':
-         { 'model_n':'HRP',
-        'isCleanWeight':False}
+              {'model_n': 'equal',
+               'isCleanWeight': False}
           }
 
 # add strategy
