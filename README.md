@@ -20,7 +20,7 @@ This is a simple script to test your portfolio on real data using preset or cust
 ## Getting started
 1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/morozkovda/Simple_Portfolio_Optimization_Backtest.git
    ```
 2. Install requirements.txt. Note that you may have some problems with plotting on backtrader to avoid this try: 
 ```sh
