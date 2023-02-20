@@ -7,11 +7,13 @@ import backtrader as bt
 from pypfopt import HRPOpt, risk_models, expected_returns
 yf.pdr_override()
 
+# create class that will contain all the models
 class Model:
     def __init__(self):
         self.data = None
         self.isFirst = True
 
+    # create function to get weights from model
     def get_allocations(self, data, **param):
 
         data = pd.DataFrame(data)
@@ -25,6 +27,7 @@ class Model:
 
         self.data = data.copy()
 
+        #here you can add your models
         if model_n == 'HRP':
             hrp = HRPOpt(self.data.pct_change(), S)
             weights = hrp.optimize()
@@ -36,7 +39,9 @@ class Model:
         return []
 
 
+# create strategy for backtrader
 class optimizer(bt.SignalStrategy):
+    # set default params
     params = (
         ('DataCounter', 125),
         ('RebalanceDay', 22),
@@ -47,6 +52,7 @@ class optimizer(bt.SignalStrategy):
         'isCleanWeight':False} )
     )
 
+    # create function to calculate difference from previous and current positiom
     def getPosDifference(self, cash, alloc, new_price, cur_pos):
         pos_cash = new_price * cur_pos
         # print('pos_cash',pos_cash)
@@ -59,30 +65,35 @@ class optimizer(bt.SignalStrategy):
         diff_pos = cur_pos - new_pos
         return diff_pos * (-1)
 
+    # get position size
     def getPosSize(self):
         p = []
         for i in range(self.nDatas):
             p.append(self.getposition(data=self.datas[i]).size)
         return np.array(p)
 
+    # get close prices
     def getCurrentClosePrice(self):
         p = []
         for i in range(self.nDatas):
             p.append(self.datas[i].close[0])
         return np.array(p)
 
+    #get open prices
     def getPosOpenPrice(self):
         p = []
         for i in range(self.nDatas):
             p.append(self.getposition(data=self.datas[i]).price)
         return np.array(p)
 
+    # get dataframe from bt.feeds for the model
     def getModelDataFrame(self):
         p = {}
         for i in range(self.nDatas):
             p[str(i)] = np.array(self.datas[i].get(size=self.DataCounter))
         return pd.DataFrame(p)
 
+   #initialize strategy
     def __init__(self):
         self.counter = 0
         self.update_counter = 0
@@ -97,6 +108,7 @@ class optimizer(bt.SignalStrategy):
         self.model_params = self.params.model_params
         pass
 
+    #create conditions for strategy
     def next(self):
         if self.counter < self.DataCounter:
             self.counter += 1

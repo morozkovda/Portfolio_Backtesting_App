@@ -8,12 +8,13 @@ import backtrader as bt
 from pypfopt import HRPOpt, risk_models, expected_returns
 yf.pdr_override()
 
+# get data
 tickers = ['BTC-USD' ,'ETH-USD', 'BNB-USD']
 stock = pdr.get_data_yahoo(tickers,
                 start= datetime(2020, 1, 1),
                 end= datetime(2023, 2, 16), interval = '1d')
-stock.head()
 
+# create function to process data for cerebro
 very_small_float = 1.0
 idx = pd.IndexSlice
 def getStock(df, s):
@@ -23,22 +24,37 @@ def getStock(df, s):
     c = c.fillna(very_small_float)
     return c
 
-from backtest import optimizer
+# import strategy
+from backtest import optimizer, Model
 
+# launch cerebro
 cerebro = bt.Cerebro()
 
+# set initial cash
 cerebro.broker.set_cash(100000)
 print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
-
+# add data to cerebro datafeed
 for a in tickers:
     cerebro.adddata(bt.feeds.PandasData(dataname=getStock(stock, a), name=a))
 
-cerebro.addstrategy(optimizer)
+# set params
+params = {'DataCounter' : 125,
+        'RebalanceDay': 22,
+        'printlog': 0,
+        'model': Model(),
+         'model_params':
+         { 'model_n':'HRP',
+        'isCleanWeight':False}
+          }
 
+# add strategy
+cerebro.addstrategy(optimizer, **params)
+
+# run strategy
 thestrats = cerebro.run()
 thestrat = thestrats[0]
 
+# plot and print results (note: to plot the results you need to install specific version of bt pip specified above)
 cerebro.plot()
-
 print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
