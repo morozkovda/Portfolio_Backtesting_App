@@ -12,11 +12,13 @@ class Model:
         self.data = None
         self.isFirst = True
 
-    # create function to get weights from model
+
+    # you can create custom optimization obejectives like this
     def deviation_risk_parity(self, w, cov_matrix):
         diff = w * np.dot(cov_matrix, w) - (w * np.dot(cov_matrix, w)).reshape(-1, 1)
         return (diff ** 2).sum().sum()
 
+    # create function to get weights from model
     def get_allocations(self, data, **param):
 
         data = pd.DataFrame(data)
