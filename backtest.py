@@ -13,6 +13,10 @@ class Model:
         self.isFirst = True
 
     # create function to get weights from model
+    def deviation_risk_parity(self, w, cov_matrix):
+        diff = w * np.dot(cov_matrix, w) - (w * np.dot(cov_matrix, w)).reshape(-1, 1)
+        return (diff ** 2).sum().sum()
+
     def get_allocations(self, data, **param):
 
         data = pd.DataFrame(data)
@@ -44,12 +48,21 @@ class Model:
                 return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
             return pd.DataFrame(weights, index=[0]).to_numpy()[0]
 
+        elif model_n == 'risk_parity':
+            ef = EfficientFrontier(mu, S)
+            weights = ef.nonconvex_objective(self.deviation_risk_parity, ef.cov_matrix)
+            cleaned_weights = ef.clean_weights()
+            if isCleanWeight == True:
+                return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
+            return pd.DataFrame(weights, index=[0]).to_numpy()[0]
+
         elif model_n == 'random':
             a = np.random.uniform(size=[self.data.shape[1]])
             return softmax(a)
         elif model_n == 'equal':
             a = np.array([1 / self.data.shape[1]] * self.data.shape[1])
             return a
+
 
         return []
 
