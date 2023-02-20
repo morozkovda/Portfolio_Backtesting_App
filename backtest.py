@@ -61,6 +61,7 @@ class Model:
         elif model_n == 'random':
             a = np.random.uniform(size=[self.data.shape[1]])
             return softmax(a)
+
         elif model_n == 'equal':
             a = np.array([1 / self.data.shape[1]] * self.data.shape[1])
             return a
