@@ -39,7 +39,7 @@ for a in tickers:
 # set params
 params = {'DataCounter' : 125,
         'RebalanceDay': 22,
-        'printlog': 0,
+        'printlog': 1,
         'model': Model(),
          'model_params':
               {'model_n': 'equal',

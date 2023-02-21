@@ -2,7 +2,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import backtrader as bt
-from pypfopt import EfficientFrontier, CLA, HRPOpt, risk_models, expected_returns
+from pypfopt import EfficientFrontier, EfficientCVaR, EfficientCDaR, CLA,  HRPOpt, risk_models, expected_returns
 from scipy.special import softmax
 yf.pdr_override()
 
@@ -50,6 +50,7 @@ class Model:
             if isCleanWeight == True:
                 return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
             return pd.DataFrame(weights, index=[0]).to_numpy()[0]
+
         elif model_n == 'HRP':
             hrp = HRPOpt(self.data.pct_change(), S)
             weights = hrp.optimize()
@@ -61,6 +62,22 @@ class Model:
         elif model_n == 'risk_parity':
             ef = EfficientFrontier(mu, S)
             weights = ef.nonconvex_objective(self.deviation_risk_parity, ef.cov_matrix)
+            cleaned_weights = ef.clean_weights()
+            if isCleanWeight == True:
+                return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
+            return pd.DataFrame(weights, index=[0]).to_numpy()[0]
+
+        elif model_n == 'cvar':
+            ef = EfficientCVaR(mu, S)
+            weights = ef.min_cvar()
+            cleaned_weights = ef.clean_weights()
+            if isCleanWeight == True:
+                return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
+            return pd.DataFrame(weights, index=[0]).to_numpy()[0]
+
+        elif model_n == 'cdar':
+            ef = EfficientCDaR(mu, S)
+            weights = ef.min_cdar()
             cleaned_weights = ef.clean_weights()
             if isCleanWeight == True:
                 return pd.DataFrame(cleaned_weights, index=[0]).to_numpy()[0]
