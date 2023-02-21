@@ -4,6 +4,7 @@ import pandas as pd
 import backtrader as bt
 from pypfopt import EfficientFrontier, EfficientCVaR, EfficientCDaR, CLA,  HRPOpt, risk_models, expected_returns
 from scipy.special import softmax
+from backtrader import Analyzer, TimeFrame
 yf.pdr_override()
 
 # create class that will contain all the models
@@ -93,6 +94,7 @@ class Model:
 
 
         return []
+
 
 
 # create strategy for backtrader
