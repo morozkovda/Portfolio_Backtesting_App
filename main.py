@@ -27,14 +27,6 @@ def getStock(df, s):
     c = pd.DataFrame(c.to_records()).set_index('Date')
     c = c.fillna(very_small_float)
     return c
-def getReturnAsDataFrame(pfa):
-    t = pfa.get_analysis()
-    listst = sorted(t.items()) # sorted by key, return a list of tuples
-    x, y = zip(*listst) # unpack a list of pairs into two tuples
-    dd = {'data':x, 'Portfolio':y}
-    df = pd.DataFrame(dd).set_index('data')
-    return df
-
 
 # import strategy
 from backtest import optimizer, Model
@@ -52,9 +44,9 @@ for a in tickers:
 
 #add analyzers
 cerebro.addanalyzer(bt.analyzers.TimeReturn, timeframe=bt.TimeFrame.Months, _name='PortfolioReturns')
-cerebro.addanalyzer(btanalyzers.SharpeRatio, riskfreerate=0.0, timeframe=bt.TimeFrame.Months, _name='mysharpe')
-cerebro.addanalyzer(btanalyzers.Returns, _name='myreturn')
-cerebro.addanalyzer(btanalyzers.DrawDown, _name='mydrawdown')
+cerebro.addanalyzer(bt.analyzers.SharpeRatio, riskfreerate=0.0, timeframe=bt.TimeFrame.Months, _name='mysharpe')
+cerebro.addanalyzer(bt.analyzers.Returns, _name='myreturn')
+cerebro.addanalyzer(bt.analyzers.DrawDown, _name='mydrawdown')
 cerebro.addanalyzer(bt.analyzers.AnnualReturn, _name='_AnnualReturn')
 
 
@@ -80,6 +72,7 @@ thestrat = thestrats[0]
 ret =  {'Max_Drawdown':thestrat.analyzers.getbyname('mydrawdown').get_analysis()['max']['drawdown'],
         'CAGR':thestrat.analyzers.getbyname('myreturn').get_analysis()['rnorm100'],
         'Annual Return' : thestrat.analyzers._AnnualReturn.get_analysis(),
+        'Portfolio Returns' : thestrat.analyzers.PortfolioReturns.get_analysis(),
         'Sharpe_Ratio':thestrat.analyzers.getbyname('mysharpe').get_analysis()['sharperatio'],
         'Value': cerebro.broker.getvalue()
         }
@@ -88,8 +81,8 @@ for key, value in ret.items():
     print("--------------- %s -----------------" %key)
     print(value)
 
-df = getReturnAsDataFrame(thestrat.analyzers.getbyname('PortfolioReturns'))
-df.to_csv('data/model_return.csv')
+df = pd.DataFrame([ret['Portfolio Returns'].values()], columns=ret['Portfolio Returns'].keys()).T
+df.to_csv('data/model_returns.csv')
 
 # plot and print results (note: to plot the results you need to install specific version of bt pip specified above)
 cerebro.plot(figsize=(230,130))
