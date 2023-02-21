@@ -81,8 +81,8 @@ for key, value in ret.items():
     print("--------------- %s -----------------" %key)
     print(value)
 
-df = pd.DataFrame([ret['Portfolio Returns'].values()], columns=ret['Portfolio Returns'].keys()).T
-df.to_csv('data/model_returns.csv')
+df_returns = pd.DataFrame([ret['Portfolio Returns'].values()], columns=ret['Portfolio Returns'].keys()).T
+df_returns.to_csv('data/model_returns.csv')
 
 # plot and print results (note: to plot the results you need to install specific version of bt pip specified above)
 cerebro.plot(figsize=(230,130))
