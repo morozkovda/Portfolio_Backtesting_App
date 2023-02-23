@@ -36,7 +36,7 @@ and you are good to go. As the output you will get stats, return and cumulative 
 
 To implement custom rebalancing models jump into backtest.py. And add your model to get_allocations func (as template use already implemented strategies).
 
-To graph all the model jump into graphs section
+To graph all the model jump into graphs.py.
 
 More features will be added soon : )
 
