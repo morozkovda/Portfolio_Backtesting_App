@@ -31,15 +31,17 @@ This is a simple script to test your portfolio on real data using preset or cust
   ```
 
 ## Workflow
-To run backtest right away jump into main.py, set params that you need for backtest (including model, training days, rebelance days, printlog e.t.c.)
-and you are good to go. As the return you will get final value of your portfolio and buy/sell orders plotted on the graph as well as change in your funds. 
+To run backtest right away jump into main.py, set params that you need for backtest (including list of models, training days, rebelance days, printlog e.t.c.)
+and you are good to go. As the output you will get stats, return and cumulative return summary as separate CSV's for each model and one that contains data on all the models, the results are located in folders as follows.
 
 To implement custom rebalancing models jump into backtest.py. And add your model to get_allocations func (as template use already implemented strategies).
+
+To graph all the model jump into graphs section
 
 More features will be added soon : )
 
 ## Supported model list
-(**in development**)
+['MV','CLA', 'HRP', 'risk_parity', 'cvar','cdar','random','equal']
 
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/daniil-morozkov/
