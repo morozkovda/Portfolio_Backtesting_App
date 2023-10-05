@@ -20,7 +20,7 @@ This is a simple app to test your portfolio on real data using preset portfolio 
 ## Getting started
 1. Clone the repo
 ```sh
- git clone
+ git clone https://github.com/morozkovda/Portfolio_Backtesting_App.git
 ```
 2. Build docker image
 ```sh
