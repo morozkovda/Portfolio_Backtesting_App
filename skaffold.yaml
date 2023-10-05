@@ -1,0 +1,35 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: portfolio
+profiles:
+  - name: production-build-and-deploy
+    activation:
+      # - kubeContext: production
+      - env: ENV_KIND=develop
+    build:
+      local:
+        useDockerCLI: true
+      artifacts:
+      - image: 169602129284.dkr.ecr.us-east-1.amazonaws.com/portfolio-develop
+        docker:
+          dockerfile: Dockerfile
+          # buildArgs:
+        hooks:
+          before:
+            - command:
+                - sh
+                - -c
+                - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 169602129284.dkr.ecr.us-east-1.amazonaws.com
+            - command:
+                [
+                  'sh',
+                  '-c',
+                  "[ -d 'adoria-infra' ] || git clone --branch main git@github.com:adoriasoft/adoria-infra.git",
+                ]
+    manifests:
+      kustomize:
+        paths:
+        - adoria-infra/kustomize/portfolio/overlays/develop
+    deploy:
+      kubectl: {}
